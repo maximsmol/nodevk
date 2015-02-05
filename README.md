@@ -1,0 +1,1 @@
+[![Coverage Status](https://coveralls.io/repos/maximsmol/nodevk/badge.svg)](https://coveralls.io/r/maximsmol/nodevk) [![Build Status](https://travis-ci.org/maximsmol/nodevk.svg)](https://travis-ci.org/maximsmol/nodevk)
