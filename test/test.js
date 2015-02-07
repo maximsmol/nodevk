@@ -98,7 +98,7 @@ describe('Teting getCodeURL', function getCodeURL()
 	});
 });
 
-describe('Testing getToken', function getToken()
+describe('Testing getServerToken', function getToken()
 {
 	describe('Not providing appId', function noAppId()
 	{
@@ -107,7 +107,7 @@ describe('Testing getToken', function getToken()
 			assert.throws(
 				function shouldThrow()
 				{
-					nodevk.getToken();
+					nodevk.getServerToken();
 				},
 				function checkError(e)
 				{
@@ -126,7 +126,85 @@ describe('Testing getToken', function getToken()
 			assert.throws(
 				function shouldThrow()
 				{
-					nodevk.getToken({appId: 'test'});
+					nodevk.getServerToken({appId: 'test'});
+				},
+				function checkError(e)
+				{
+					return e instanceof Error &&
+						e.message === 'appSecret is required';
+				},
+				'Wrong error'
+			);
+		});
+	});
+
+	describe('Not providing optional options', function noOptional()
+	{
+		it('Should use default options', function test()
+		{
+			var correctResult = 'GET https://oauth.vk.com/access_token?';
+			correctResult += 'client_id=test';
+			correctResult += '&client_secret=secret-shhhh';
+			correctResult += '&v='+nodevk.DEFAULT_VERSION;
+			correctResult += '&grant_type=client_credentials';
+
+			assert.strictEqual(nodevk.getServerToken(
+			{
+				appId: 'test',
+				appSecret: 'secret-shhhh',
+
+				dryRun: true
+			}), correctResult);
+		});
+	});
+
+	describe('Testing actual call', function apiCall()
+	{
+		it('Should not throw an error', function test(done)
+		{
+			assert.doesNotThrow(function shouldNotThrow()
+			{
+				nodevk.getServerToken({
+					appId: 'test',
+					appSecret: 'secret-shhhh'
+				}, function handleResponse()
+				{
+					done();
+				});
+			});
+		});
+	});
+});
+
+describe('Testing getAccessTokenFromCode', function getToken()
+{
+	describe('Not providing appId', function noAppId()
+	{
+		it('Should throw an error', function test()
+		{
+			assert.throws(
+				function shouldThrow()
+				{
+					nodevk.getAccessTokenFromCode();
+				},
+				function checkError(e)
+				{
+					return e instanceof Error &&
+						e.message === 'appId is required';
+				},
+				'Wrong error'
+			);
+		});
+	});
+
+	describe('Not providing appSecret', function noAppSecret()
+	{
+		it('Should throw an error', function test()
+		{
+			assert.throws(
+				function shouldThrow()
+				{
+					nodevk.getAccessTokenFromCode({appId: 'test'});
 				},
 				function checkError(e)
 				{
@@ -145,7 +223,7 @@ describe('Testing getToken', function getToken()
 			assert.throws(
 				function shouldThrow()
 				{
-					nodevk.getToken({appId: 'a', appSecret: 'b'});
+					nodevk.getAccessTokenFromCode({appId: 'a', appSecret: 'b'});
 				},
 				function checkError(e)
 				{
@@ -168,7 +246,7 @@ describe('Testing getToken', function getToken()
 			correctResult += '&code=MEACCESSCODE';
 			correctResult += '&v='+nodevk.DEFAULT_VERSION;
 
-			assert.strictEqual(nodevk.getToken(
+			assert.strictEqual(nodevk.getAccessTokenFromCode(
 			{
 				appId: 'test',
 				appSecret: 'secret-shhhh',
@@ -185,7 +263,7 @@ describe('Testing getToken', function getToken()
 		{
 			assert.doesNotThrow(function shouldNotThrow()
 			{
-				nodevk.getToken({
+				nodevk.getAccessTokenFromCode({
 					appId: 'test',
 					appSecret: 'secret-shhhh',
 					code: 'MEACCESSCODE'
